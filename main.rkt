@@ -228,7 +228,6 @@
 (gui-init)
 ; ====================================================================
 
-
 ;(define (del-obj obj olist) (filter (λ(x)(not(equal? x obj))) olist))
 (define (draw-element element) ([(main-draw 'draw) nil (element 'get-type)]
                                 (element 'get-param)))
