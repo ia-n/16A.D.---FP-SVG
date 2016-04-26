@@ -32,6 +32,8 @@
 ;;					 each paired with id symbol in a sublist.
 ;;	'get-tool-btns - list of tool box controls,
 ;;					 each paired with id symbol in a sublist.
+;; 'get-pen   - returns current pen (stroke) set in color/prop window
+;; 'get-brush - returns current brush (fill) set in color/prop window
 ;;
 ;;----
 ;;----
@@ -43,7 +45,7 @@
   ; GUI Callbacks
   ; --------------
   
-  ; Canvas callback
+  ; Main canvas callback
   (define p-callback
     (λ (canvas dc)
       (send dc
@@ -60,9 +62,16 @@
       (begin (set! current-util 
                    (cadr (assq obj util-buttons)))
              (cond ((eq? current-util 'save)
-                    [(svg 'save) (put-file)])))))
+                    [(svg 'save) (put-file)])
+                   ((eq? current-util 'undo)
+                    (begin (svg 'remove-last)
+                           (send m-wnd-canvas
+                                 on-event
+                                 (new mouse-event%	 
+                                      [event-type 'left-down]))
+                           (refresh-canvas)))))))
 
-  
+
   ; Selected tool
   (define current-tool '())
   ; Common tool-box buttons callback
@@ -77,13 +86,160 @@
 
   ;; Main window frame
   (define m-wnd (new frame%
-                     [label "SVG-Edit"]
+                     [label "SkraM-SVG"]
                      [x 0]
                      [y 0]
                      [min-width 800]
                      [min-height 600]
                      [stretchable-width #f]	 
                      [stretchable-height #f]))
+  
+  ; =========================================================
+  ;; Color/Properties window
+
+  ;; Make current Pen/Brush color, associated procs
+  (define c-pen '())
+  (define c-brush '())
+  
+  (define (mk-color clr [alpha 1.0])
+    (make-object
+        color%
+      (car clr)
+      (cadr clr)
+      (caddr clr)
+      alpha))
+
+  (define (mk-pen clr)
+    (set! c-pen (new pen%
+                     [color clr]
+                     [width 5]
+                     [style 'solid])))
+  (define (mk-brush clr)
+    (set! c-brush (new brush% [color clr])))
+
+  (mk-pen (mk-color '(0 0 0)))
+  (mk-brush (mk-color '(0 0 0) 0.0))
+
+
+  ; Color select canvas callback
+  (define c-callback
+    (λ (canvas dc)
+      (send dc
+            draw-bitmap
+            bmp-c
+            0 0)))
+
+  ; Color sliders common callback
+  (define color-callback
+    (λ (obj event)
+      (begin
+        (define colors
+          (map (λ (x)(send (car x) get-value))
+               color-sliders))
+        (cond ((eq? current-sf-radio 0)
+               (mk-pen (mk-color colors)))
+              ((eq? current-sf-radio 1)
+               (mk-brush (mk-color colors))))
+        
+        (send bmp-c-dc set-pen c-pen)
+        (send bmp-c-dc set-brush c-brush)
+        (send bmp-c-dc draw-ellipse
+                   30
+                   50
+                   140
+                   50)
+        (send p-wnd-canvas refresh-now))))
+
+  ; Current radio-box
+  (define current-sf-radio 0)
+  ; Stroke/Fill radio buttons
+  ; common callback
+  (define sf-callback
+    (λ (obj event)
+      (set! current-sf-radio
+            (send sf-radio-box get-selection))
+            (color-callback #f #f)))
+  
+  ; Properties window frame
+  (define p-wnd (new frame%
+                     [label "Color"]
+                     [x 800]
+                     [y 0]
+                     [min-width 200]
+                     [min-height 350]
+                     [style (list 'no-system-menu)]
+                     [parent m-wnd]
+                     [stretchable-width #f]	 
+                     [stretchable-height #f]))
+
+  (define p-wnd-slider_pane (new vertical-pane% [parent p-wnd]
+                                 [alignment (list 'center 'center)]))
+
+  ;; Color/prop window canvas
+  (define p-wnd-canvas (new canvas%
+                            [parent p-wnd-slider_pane]
+                            ;[min-width 50]	 
+                            ;[min-height min-height]
+                            [paint-callback c-callback]))
+
+  
+  ;; Bitmap for color selection, and bitmap-dc
+  (define bmp-c (make-object bitmap% 200 300))
+  (define bmp-c-dc (new bitmap-dc%
+                      [bitmap bmp-c]))
+
+  ;; Generic make sliders.
+  ;; slider_list - (label (range-s range-e) tag)
+  (define (mk-sliders gui_parent slider_list callproc)
+    (map (λ(x) (list (new slider%
+                          [label (car x)]	 
+                          [min-value (car (cadr x))]	 
+                          [max-value (cadr (cadr x))]	 
+                          [parent gui_parent]	 
+                          [callback callproc]	 
+                          [init-value (caddr x)])
+                     (cadddr x)))
+         slider_list))
+
+  ;; Color sliders list. 
+  (define sliders-lst (list '("R" (0 255) 0 'red-s)
+                            '("G" (0 255) 0 'green-s)
+                            '("B" (0 255) 0 'blue-s)))
+  ;; Generated color slider list
+  ;; of (slider-obj tag) pairs
+  (define color-sliders (mk-sliders p-wnd-slider_pane
+                                    sliders-lst
+                                    color-callback))
+
+
+  ;; Generic make radio-box.
+  ;; radio_list - (label select tag)
+;  (define (mk-radios gui_parent radio_list callproc)
+;    (map (λ(x) (list (new radio-box%	 
+;                          [label (car x)]	 
+;                          [selection (cadr x)]	 
+;                          [parent gui_parent]	 
+;                          [callback callproc]
+;                     (caddr x))))
+;         radio_list))
+
+  ;; Radio-box list
+;  (define radios-lst (list '("Stroke" 1 'stroke)
+;                            '("Fill" 0 'fill)))
+;
+;  (define sf-radio-box (mk-radios p-wnd-slider_pane
+;                                radios-lst
+;                                sf-callback))
+
+  (define sf-radio-box (new radio-box%	 
+                            [label ""]
+                            [choices (list "Stroke" "Fill")]
+                            [selection 0]	 
+                            [parent p-wnd-slider_pane]	 
+                            [callback sf-callback]))
+  ; ===========================================================
+  
+
 
   ;; Main window pane
   ;(provide m-wnd_pane)
@@ -145,7 +301,7 @@
                                [alignment (list 'center 'center)]))
 
   ;; Utility buttons
-  (set! btn_lst (list '("-n-" n)
+  (set! btn_lst (list '("Undo" undo)
                       '("-n-" n)
                       '("Save" save)
                       '("-n-" n)))
@@ -170,7 +326,9 @@
 ; ---------------------------
 
   ;; dispaly GUI
-  (define (show-gui) (send m-wnd show #t))
+  (define (show-gui)
+    (send m-wnd show #t)
+    (send p-wnd show #t))
 
   ;; Resize bitmap to fit canvas
   (define (bmp-resize)
@@ -180,11 +338,13 @@
     (send bmp-dc
           set-bitmap bmp))
 
-  ;; Set drawing canvas
+  ;; Set drawing canvas (also, make init run of
+  ;; color-callback
   (define (set-canvas canvas)
     (set! m-wnd-canvas (new canvas
                             [parent m-wnd_pane]
-                            [paint-callback p-callback])))
+                            [paint-callback p-callback]))
+    (color-callback #f #f))
 
   ;; Set drawn shapes list to operate on
   (define svg '())
@@ -222,6 +382,8 @@
           ((eq? msg 'get-current-util) current-util)
           ((eq? msg 'get-util-btns) util-buttons)
           ((eq? msg 'get-tool-btns) tool-box-buttons)
+          ((eq? msg 'get-pen) c-pen)
+          ((eq? msg 'get-brush) c-brush)
           (else (display "No such thing in here"))))
   dispatch)
           
