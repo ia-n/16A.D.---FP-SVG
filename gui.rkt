@@ -100,6 +100,7 @@
   ;; Make current Pen/Brush color, associated procs
   (define c-pen '())
   (define c-brush '())
+    (define current-fill-check #f)
   
   (define (mk-color clr [alpha 1.0])
     (make-object
@@ -136,49 +137,78 @@
             bmp-c
             0 0)))
 
+
+(define fill-callback
+ (λ (obj event )
+(begin
+  (define colors
+          (map (λ (x)(send (car x) get-value))
+               color-sliders))
+(set! current-fill-check (send fill-check-box get-value))
+  (display  current-fill-check )
+   ( if (eq? current-fill-check #f)
+       (mk-brush  (mk-color '(0 0 0) 0.0))
+(mk-brush  (mk-color  colors))
+
+)
+    (send bmp-c-dc set-pen c-pen)
+        (send bmp-c-dc set-brush c-brush)
+   (display c-brush)
+   )))
+       ;(display (color-callback #f #f)))))
+   
+(define pcolors '());
+ (define bcolors (mk-color '(0 0 0) 0.0))
+  (define psave (list 0 0 0))
+   (define bsave (list 0 0 0))
   ; Color sliders common callback
   (define color-callback
     (λ (obj event)
       (begin
-        (define colors
-          (map (λ (x)(send (car x) get-value))
-               color-sliders))
+
+
+        
+        
         (cond ;(and
  
-(( if (eq? current-fill-check #f)
-(cond (
-       (eq? current-sf-radio 0)
-               (begin   (mk-brush  (mk-color '(0 0 0) 0.0))
-                 (mk-pen (mk-color colors ) ;'transparent
-                       )))
+;(( if (eq? current-fill-check #f)
+;(cond (
+       ((eq? current-sf-radio 0)
 
-                ((eq? current-sf-radio 1) (begin   (mk-brush  (mk-color '(0 0 0) 0.0))
-                 (mk-pen (mk-color colors ) ;'transparent
-                       )))
+ 
+
+        
+        (begin ;     (display saved);(send (car color-sliders) get-value))
+;(display "\n")
+          (set! pcolors
+                (map (λ (x)(send (car x) get-value))
+                     color-sliders))
+              
+          (mk-pen (mk-color pcolors ) )
+          (set! psave pcolors)
+                        ; (mk-brush (mk-color colors ));'transparent
+                      ))
+
+                ((eq? current-sf-radio 1) ;(begin   (mk-brush  (mk-color '(0 0 0) 0.0))
+(begin
+(set! bcolors
+          (map (λ (x)(send (car x) get-value))
+               color-sliders))
+                 
+                 (mk-brush (mk-color bcolors ) )
+ (set! bsave bcolors)
+                 );'transparent
+;(mk-pen (mk-color colors ))
+                           )
  )
 
-(cond (
-       (eq? current-sf-radio 1)(mk-brush (mk-color colors ) ))
-      ((eq? current-sf-radio 0) ( (mk-pen (mk-color colors ))))))))
-        ;                              possible prob^
+(set! current-fill-check (send fill-check-box get-value))
+        ( if (eq? current-fill-check #f)
+       (mk-brush  (mk-color '(0 0 0) 0.0))
+(mk-brush  (mk-color  bcolors))
 
-        
-;               ( (and  (eq? current-fill-check #f)) ;)
-;
-;(begin   (mk-brush  (mk-color '(0 0 0) 0.0))
-;                ))
-;            ;  ((and
-;                ((and (eq? current-sf-radio 1) (eq? current-fill-check #f))
-;                ;(eq? current-outline-radio 1))
-;               )
-;
-;
-;              
-;                )
-        
-            ;  ((and (eq? current-sf-radio 1) (eq? current-outline-radio 0))
-             ;  (mk-pen (mk-color colors ) 'transparent )))
-        
+)
+
         (send bmp-c-dc set-pen c-pen)
         (send bmp-c-dc set-brush c-brush)
         (send bmp-c-dc draw-ellipse
@@ -186,19 +216,20 @@
                    50
                    140
                    50)
-        (send p-wnd-canvas refresh-now))))
+        (send p-wnd-canvas refresh-now)
+        )))
 
 
 
-  (define current-fill-check #f)
 
 
-(define fill-callback
-    (λ (obj event)
-      (set! current-fill-check
-            (send fill-check-box get-value))
-            (color-callback #f #f)))
-  
+
+;(define fill-callback
+;    (λ (obj event)
+;      (set! current-fill-check
+;            (send fill-check-box get-value))
+;            (color-callback #f #f)))
+;  
 
 
 
@@ -215,9 +246,35 @@
   ; common callback
   (define sf-callback
     (λ (obj event)
-      (set! current-sf-radio
+      (begin
+
+        (set! current-sf-radio
             (send sf-radio-box get-selection))
-            (color-callback #f #f)))
+            
+
+;(display  color-sliders)
+(display "\n")
+(display psave)
+            
+(cond ((eq? current-sf-radio 0)
+    
+ (map (λ (x y)(send (car x) set-value  y ))
+                     color-sliders psave)))
+
+(cond ((eq? current-sf-radio 1)
+    
+ (map (λ (x y)(send (car x) set-value  y ))
+                     color-sliders bsave)))
+
+
+
+      ;1
+ ;              )
+ ; )
+(color-callback #f #f)
+
+;)
+      )))
   
   ; Properties window frame
   (define p-wnd (new frame%
@@ -278,7 +335,7 @@
                          ;                  "No Outline")]
                           ;  [selection 0]	 
                             [parent p-wnd-slider_pane]	 
-                            [callback fill-callback]))
+                            [callback color-callback]))
   
 
 
@@ -414,7 +471,10 @@
     (set! m-wnd-canvas (new canvas
                             [parent m-wnd_pane]
                             [paint-callback p-callback]))
-    (color-callback #f #f))
+    (color-callback #f #f)
+    (fill-callback #f #f)
+
+    )
 
   ;; Set drawn shapes list to operate on
   (define svg '())
