@@ -109,16 +109,23 @@
       (caddr clr)
       alpha))
 
-  (define (mk-pen clr)
+  (define (mk-pen clr ;fill
+                  )
     (set! c-pen (new pen%
                      [color clr]
                      [width 5]
-                     [style 'solid])))
-  (define (mk-brush clr)
-    (set! c-brush (new brush% [color clr])))
+                     )))
+  (define (mk-brush clr  )
+    (set! c-brush (new brush%
+                     ;  [style fill]
+                       [color clr]
+;[stipple 'bdiagonal-hatch]
+                      )
 
-  (mk-pen (mk-color '(0 0 0)))
-  (mk-brush (mk-color '(0 0 0) 0.0))
+          ))
+
+  (mk-pen (mk-color '(0 0 0)));  'solid)
+  (mk-brush (mk-color '(0 0 0) 0.0)); 'solid)
 
 
   ; Color select canvas callback
@@ -136,10 +143,41 @@
         (define colors
           (map (λ (x)(send (car x) get-value))
                color-sliders))
-        (cond ((eq? current-sf-radio 0)
-               (mk-pen (mk-color colors)))
-              ((eq? current-sf-radio 1)
-               (mk-brush (mk-color colors))))
+        (cond ;(and
+ 
+(( if (eq? current-fill-check #f)
+(cond (
+       (eq? current-sf-radio 0)
+               (begin   (mk-brush  (mk-color '(0 0 0) 0.0))
+                 (mk-pen (mk-color colors ) ;'transparent
+                       )))
+
+                ((eq? current-sf-radio 1) (begin   (mk-brush  (mk-color '(0 0 0) 0.0))
+                 (mk-pen (mk-color colors ) ;'transparent
+                       )))
+ )
+
+(cond (
+       (eq? current-sf-radio 1)(mk-brush (mk-color colors ) ))
+      ((eq? current-sf-radio 0) ( (mk-pen (mk-color colors ))))))))
+        ;                              possible prob^
+
+        
+;               ( (and  (eq? current-fill-check #f)) ;)
+;
+;(begin   (mk-brush  (mk-color '(0 0 0) 0.0))
+;                ))
+;            ;  ((and
+;                ((and (eq? current-sf-radio 1) (eq? current-fill-check #f))
+;                ;(eq? current-outline-radio 1))
+;               )
+;
+;
+;              
+;                )
+        
+            ;  ((and (eq? current-sf-radio 1) (eq? current-outline-radio 0))
+             ;  (mk-pen (mk-color colors ) 'transparent )))
         
         (send bmp-c-dc set-pen c-pen)
         (send bmp-c-dc set-brush c-brush)
@@ -150,6 +188,27 @@
                    50)
         (send p-wnd-canvas refresh-now))))
 
+
+
+  (define current-fill-check #f)
+
+
+(define fill-callback
+    (λ (obj event)
+      (set! current-fill-check
+            (send fill-check-box get-value))
+            (color-callback #f #f)))
+  
+
+
+
+;~~~~~~~~~~~~~~possible prob
+  
+
+
+
+  
+  
   ; Current radio-box
   (define current-sf-radio 0)
   ; Stroke/Fill radio buttons
@@ -210,6 +269,17 @@
   (define color-sliders (mk-sliders p-wnd-slider_pane
                                     sliders-lst
                                     color-callback))
+
+
+
+  (define fill-check-box (new check-box%	 
+                            [label "Apply fill"]
+                        ;    [choices (list "Outline"
+                         ;                  "No Outline")]
+                          ;  [selection 0]	 
+                            [parent p-wnd-slider_pane]	 
+                            [callback fill-callback]))
+  
 
 
   ;; Generic make radio-box.
@@ -279,8 +349,8 @@
   
   ;; Tool-box buttons
   (define btn_lst (list '("Line" line) '("Ellipse" ellipse)
-                        '("Circle" circle) '("Rectangle" rectangle)
-                         '("Square" square) '("--n--" n)
+                        '("--n--" n) '("--n--" n)
+                         '("--n--" n) '("--n--" n)
                          '("--n--" n) '("--n--" n)
                          '("--n--" n) '("--n--" n)
                          '("--n--" n)))
