@@ -279,8 +279,8 @@
   
   ;; Tool-box buttons
   (define btn_lst (list '("Line" line) '("Ellipse" ellipse)
-                        '("--n--" n) '("--n--" n)
-                         '("--n--" n) '("--n--" n)
+                        '("Circle" circle) '("Rectangle" rectangle)
+                         '("Square" square) '("--n--" n)
                          '("--n--" n) '("--n--" n)
                          '("--n--" n) '("--n--" n)
                          '("--n--" n)))
