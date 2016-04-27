@@ -7,7 +7,7 @@
 
 (define nil '())
 
-;(define mouse-d-pos (list 0 0))
+;(define mousdasse-d-pos (list 0 0))
 ;(define obj-list '())
 
 
@@ -30,8 +30,14 @@
       (cond ((eq? type 'line) (list 'line
                                     line))
             ((eq? type 'ellipse) (list 'ellipse
-                                      ellipse))
-            (else (list 'n
+                                       ellipse))
+            ((eq? type 'square) (list 'square
+                                       square))
+            ((eq? type 'rectangle) (list 'rectangle
+                                       rectangle))
+            ((eq? type 'circle) (list 'circle
+                                                   circle))
+                        (else (list 'n
                         (λ([var #f]) 'emptylambda)))))
 
     ;Set current tool
@@ -128,7 +134,7 @@
               (caddr mouse-square)
               (cadddr mouse-square)))
 
-    ;Circle - coords cx, cy, r
+    ;Ellipse - coords cx, cy, r
     (define (ellipse [params #f])
       (mk-mouse-square params)
       (set-dc-pen params)
@@ -148,6 +154,87 @@
               w
               h)))
 
+
+    ;rectangle - coords cx, cy, r
+    (define (rectangle [params #f])
+      (mk-mouse-square params)
+      (set-dc-pen params)
+      (set-dc-brush params)
+      (let ((sx (min (car mouse-square)
+                     (caddr mouse-square)))
+            (sy (min (cadr mouse-square)
+                     (cadddr mouse-square)))
+            (w (abs (- (caddr mouse-square)
+                       (car mouse-square))))
+            (h (abs (- (cadddr mouse-square)
+                       (cadr mouse-square)))))
+        (mk-mouse-square (list sx sy (+ sx w)  (+ sy h)))
+        (send (maingui 'get-bmp-dc) draw-rectangle
+              sx
+              sy
+              w
+              h)))
+
+
+    
+    ;Circle
+    (define (circle [params #f])
+      (mk-mouse-square params)
+      (set-dc-pen params)
+      (set-dc-brush params)
+      (let (
+            (x1 (car mouse-square))
+            (x2 (caddr mouse-square))
+            (y1 (cadr mouse-square))
+            (y2 (cadddr mouse-square))
+
+            (sx (min (car mouse-square)
+                     (caddr mouse-square)))
+            (sy (min (cadr mouse-square)
+                     (cadddr mouse-square)))
+            (w (abs (- (caddr mouse-square)
+                       (car mouse-square))))
+            (h (abs (- (cadddr mouse-square)
+                       (cadr mouse-square)))))
+        (mk-mouse-square (list sx sy (+ sx w)  (+ sy h)))
+        (send (maingui 'get-bmp-dc) draw-ellipse
+              ((λ () ( if (> x1  x2)
+                         (- x1 (max w h)) sx)))
+                 ((λ () ( if (> y1  y2)
+                         (- y1 (max w h)) sy)))
+              ((λ (xsv) (begin (set! xsv (max w h)) xsv))0)
+             ((λ (xsv) (begin (set! xsv (max w h)) xsv))0))))
+
+     ;square
+    (define (square [params #f])
+      (mk-mouse-square params)
+      (set-dc-pen params)
+      (set-dc-brush params)
+      (let (
+            (x1 (car mouse-square))
+            (x2 (caddr mouse-square))
+            (y1 (cadr mouse-square))
+            (y2 (cadddr mouse-square))
+
+            (sx (min (car mouse-square)
+                     (caddr mouse-square)))
+            (sy (min (cadr mouse-square)
+                     (cadddr mouse-square)))
+            (w (abs (- (caddr mouse-square)
+                       (car mouse-square))))
+            (h (abs (- (cadddr mouse-square)
+                       (cadr mouse-square)))))
+        (mk-mouse-square (list sx sy (+ sx w)  (+ sy h)))
+        (send (maingui 'get-bmp-dc) draw-rectangle
+              ((λ () ( if (> x1  x2)
+                         (- x1 (max w h)) sx)))
+                 ((λ () ( if (> y1  y2)
+                         (- y1 (max w h)) sy)))
+              ((λ (xsv) (begin (set! xsv (max w h)) xsv))0)
+             ((λ (xsv) (begin (set! xsv (max w h)) xsv))0))))
+
+
+    
     ;; ---------------------------------------------------
 
     

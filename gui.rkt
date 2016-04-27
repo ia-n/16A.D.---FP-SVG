@@ -100,6 +100,7 @@
   ;; Make current Pen/Brush color, associated procs
   (define c-pen '())
   (define c-brush '())
+    (define current-fill-check #f)
   
   (define (mk-color clr [alpha 1.0])
     (make-object
@@ -109,16 +110,17 @@
       (caddr clr)
       alpha))
 
-  (define (mk-pen clr)
+  (define (mk-pen clr 
+                  )
     (set! c-pen (new pen%
                      [color clr]
                      [width 5]
-                     [style 'solid])))
-  (define (mk-brush clr)
-    (set! c-brush (new brush% [color clr])))
+                     )))
+  (define (mk-brush clr  )
+    (set! c-brush (new brush% [color clr] ) ))
 
-  (mk-pen (mk-color '(0 0 0)))
-  (mk-brush (mk-color '(0 0 0) 0.0))
+  (mk-pen (mk-color '(0 0 0) ));  'solid)
+  (mk-brush (mk-color '(0 0 0) 0.0)); 'solid)
 
 
   ; Color select canvas callback
@@ -129,26 +131,65 @@
             bmp-c
             0 0)))
 
+;fill callback 
+(define fill-callback
+ (λ (obj event )
+(begin
+(set! current-fill-check (send fill-check-box get-value))
+(color-callback obj event)
+
+)
+))
+    
+   
+(define pcolors (mk-color '(0 0 0)));pen colors
+ (define bcolors (mk-color '(0 0 0) 0.0));brush colors
+  (define psave (list 0 0 0)) ;used to save pen settings
+   (define bsave (list 0 0 0)) ;used to save brush settings
+
+
   ; Color sliders common callback
   (define color-callback
     (λ (obj event)
       (begin
-        (define colors
-          (map (λ (x)(send (car x) get-value))
+        (cond 
+       ((eq? current-sf-radio 0);true if stroke selected
+        (begin
+          (set! pcolors ;sets pcolors to the current slider selections
+                (map (λ (x)(send (car x) get-value))
+                     color-sliders))
+          
+          (mk-pen (mk-color pcolors ) ) ;sets the current color
+          
+          (set! psave pcolors) ;saves the colors
+                        ; (mk-brush (mk-color colors ));'transparent
+                      ))
+
+                ((eq? current-sf-radio 1) ;true if fill has been selected
+(begin
+(set! bcolors;sets bcolors to the current slider selection
+          (map (λ (x)(send (car x) get-value));problem causer
                color-sliders))
-        (cond ((eq? current-sf-radio 0)
-               (mk-pen (mk-color colors)))
-              ((eq? current-sf-radio 1)
-               (mk-brush (mk-color colors))))
-        
-        (send bmp-c-dc set-pen c-pen)
+                 
+                 (mk-brush (mk-color bcolors ) ) ;sets the current color
+
+                 (set! bsave bcolors) ;saves the color selection
+                 ) )
+
+                )
+( if (eq? current-fill-check #f) ;checks if user wants to fill color
+       (mk-brush  (mk-color '(0 0 0) 0.0)) ;no color
+(mk-brush  (mk-color  bcolors))) ; color
+
+        (send bmp-c-dc set-pen c-pen);refreshes the objects
         (send bmp-c-dc set-brush c-brush)
         (send bmp-c-dc draw-ellipse
                    30
                    50
                    140
                    50)
-        (send p-wnd-canvas refresh-now))))
+        (send p-wnd-canvas refresh-now)
+        )))
 
   ; Current radio-box
   (define current-sf-radio 0)
@@ -156,9 +197,35 @@
   ; common callback
   (define sf-callback
     (λ (obj event)
-      (set! current-sf-radio
+      (begin
+
+        (set! current-sf-radio
             (send sf-radio-box get-selection))
-            (color-callback #f #f)))
+            
+
+;(display  color-sliders)
+(display "\n")
+(display psave)
+            
+(cond ((eq? current-sf-radio 0)
+    
+ (map (λ (x y)(send (car x) set-value  y ))
+                     color-sliders psave)))
+
+(cond ((eq? current-sf-radio 1)
+    
+ (map (λ (x y)(send (car x) set-value  y ))
+                     color-sliders bsave)))
+
+
+
+      ;1
+ ;              )
+ ; )
+(color-callback #f #f)
+
+;)
+      )))
   
   ; Properties window frame
   (define p-wnd (new frame%
@@ -197,7 +264,7 @@
                           [max-value (cadr (cadr x))]	 
                           [parent gui_parent]	 
                           [callback callproc]	 
-                          [init-value (caddr x)])
+                          [init-value 0])
                      (cadddr x)))
          slider_list))
 
@@ -210,6 +277,22 @@
   (define color-sliders (mk-sliders p-wnd-slider_pane
                                     sliders-lst
                                     color-callback))
+
+
+
+  (define fill-check-box (new check-box%	 
+                            [label "Apply fill"]
+                        ;    [choices (list "Outline"
+                         ;                  "No Outline")]
+                           ; [value #f]	 
+                            [parent p-wnd-slider_pane]	 
+                            [callback fill-callback]
+
+                            )
+
+
+    )
+  
 
 
   ;; Generic make radio-box.
@@ -279,11 +362,9 @@
   
   ;; Tool-box buttons
   (define btn_lst (list '("Line" line) '("Ellipse" ellipse)
-                        '("--n--" n) '("--n--" n)
-                         '("--n--" n) '("--n--" n)
-                         '("--n--" n) '("--n--" n)
-                         '("--n--" n) '("--n--" n)
-                         '("--n--" n)))
+                        '("Circle" circle) '("Rectangle" rectangle)
+                         '("Square" square) '("--n--" n)
+                       ))
   
   (define tool-box-buttons (mk_buttons m-wnd-tool_pane
                                        btn_lst
@@ -344,7 +425,10 @@
     (set! m-wnd-canvas (new canvas
                             [parent m-wnd_pane]
                             [paint-callback p-callback]))
-    (color-callback #f #f))
+    (color-callback #f #f)
+    (fill-callback #f #f)
+
+    )
 
   ;; Set drawn shapes list to operate on
   (define svg '())
