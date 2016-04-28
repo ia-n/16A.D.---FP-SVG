@@ -15,7 +15,7 @@ Much similar to your typical paint program. With this software you are able to c
 ##Concepts Demonstrated
 
 * **Object Passing** is used for the majority of the GUI 
-* The objects for the shapes stored the type of shape as well as attributes *
+* The objects for the shapes stored the type of shape as well as attributes 
 * **Message passing** is how our different files communicate.
 
 ##External Technology and Libraries
