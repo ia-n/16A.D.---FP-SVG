@@ -1,66 +1,68 @@
-# Project Title: SVG Editor
+# FP7-SkraM
+##Authors
 
-  [**Jump to the progress**](https://github.com/oplS16projects/SkraM---FP-SVG/blob/master/README.md#progress)
+Ian Roberts
 
-### Statement
-The goal of this project is to implement XML-based Scalable Vector Graphics specification on a limited basis and to provide means to edit svg documents graphically.
+Dmitri Kheifets
 
-### Analysis
-The project will make use of several concepts.
+##Overview
+A brief description of the project is given here.  The description is 1 to 3 sentences long.  Be concise and clear.
+Much similar to your typical paint program. With this software you are able to construct Customize objects and place them on the screen. 
+##Screenshot
 
-* **Recursion**
-  * Recursive HOPs, such as map and filter, will be used to retrieve data from the lists populated with "element" objects.
- 
-* **Object-orientation**
-  * Objects will be used to store individual "elements" parameters.
 
-### Deliverable and Demonstration
-The deliverable will be a GUI application with minimalistic toolset and a canvas, where primitive objects, such as lines, squares and circles will be placed. The application will allow to store canvas drawing in form of SVG document, and be able to render SVG documents
-created with it (due to limited nature of implementation, most SVG documents created with other editors will be only partially compatible or incompatible at all). There will be an option available to modify each element on the screen individually via properties dialog.
 
-### Evaluation of Results
-If an application will be able to store and render the same SVG document without distortions/errors, this would indicate a scuccess.
+![screenshot showing application use](oplss.png)
 
-## Architecture Diagram
-![diagram][archdiagram]
+##Concepts Demonstrated
+Identify the OPL concepts demonstrated in your project. Be brief. A simple list and example is sufficient. 
+* **Object Passing** is used for the majority of the GUI 
+* The objects for the shapes stored the type of shape as well as attributes *
+* **Message passing** is how our different files communicate.
 
-## Schedule
+##External Technology and Libraries
+Briefly describe the existing technology you utilized, and how you used it. Provide a link to that technology(ies).
+racket/gui/base provided us with the canvas, panes, gui objects and  mouse events 
+racket/draw provided us with color, brush and bitmap objects
+xml provided us with the functionality to save our picture
 
-### Progress
- Goals for the second milestone are met partially. Currently, the framework of application is almost complete, basic functionality is
- in place - drawing shapes, exporting image to SVG.
- 
- **Sample SVG output generated with SkraM:**
-  ![sample][sample-out]
- 
-### First Milestone (Fri Apr 15)
-* Semi-complete GUI frontend.
- * **##done** 
-* Ability to draw at least one shape 
-  and disaplay properties of drawn objects. 
- * **##partial - drawn shapes' properties aren't viewable yet**
-* Export image to SVG. 
- * **##not implemented yet**
 
-### Second Milestone (Fri Apr 22)
-* Complete GUI frontend **##partial**
-* Import from SVG. **##not implemented yet**
-* Export image to SVG **##complete**
-* Ability to modify properties of individual
-  shapes placed on canvas. **##not implemented yet**
-* More shapes added.
+##Favorite Scheme Expressions
+####Mark (a team member)
 
-### Final Presentation (last week of semester)
-* Refining the code/documentation,
-* Expanding on / adding functionality - if time permits.
+```    ((λ () ( if (> x1  x2) (- x1 (max w h)) sx)))
+```            ((λ () ( if (> y1  y2)  (- y1 (max w h)) sy)))
+```          ((λ (max-run) (begin (set! max-run (max w h)) max-run))0)
+```            ((λ (max-run) (begin (set! max-run (max w h)) max-run))0)
+The code above was used to allow a shape object to change its starting and end points
+without that ability you could not draw a shape upwards or left.
+The reason I like this code so much is because it stumped me for a long time.
+What made it so difficult was trying to debug, with no clear indications other
+than a crazy shape movement pattern it required me to deeply think about the
+math events happening on the grid
 
-## Group Responsibilities
+#How to Download and Run
 
-### Dmitri Kheifets @tetra-d
-Will be working on implementation of SVG document structure and it's elements, import/export of SVG document, event handling and overall application architecture.
+The code can be downloaded here:
+https://github.com/ia-n/16A.D.---FP-SVG.git
 
-### Ian Roberts @ia-n
-Ian Roberts will be working on adding the shape components as well as implementing the event handling using respective libraries.
-<!-- Links -->
-[archdiagram]: ./archchart.png
-[sample-out]: https://cdn.rawgit.com/oplS16projects/SkraM---FP-SVG/master/test.svg
+To start things off, you need to only run main.rkt
+
+From here we have a few menus, 
+
+Main Window
+The left side you will find your shapes.
+At the bottom Save and undo.
+The rest is your drawing area
+
+Side window
+
+The radio buttons 'stroke 'fill
+These will allow you to change the color of the outline/filling.
+Whats nice about these is that they remember their respective color settings
+
+The above shape
+The oval above allows you to preview the colors you have selected.
+
+Apply fill check box
+This gives the user the choice to to draw the shapes with or without filling.
