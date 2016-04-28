@@ -20,9 +20,16 @@ Much similar to your typical paint program. With this software you are able to c
 
 ##External Technology and Libraries
 
-racket/gui/base provided us with the canvas, panes, gui objects and  mouse events 
-racket/draw provided us with color, brush and bitmap objects
-xml provided us with the functionality to save our picture
+* **racket/gui/base** provided us with the canvas, panes, gui objects and  mouse events 
+* **racket/draw** provided us with color, brush and bitmap objects
+* **xml** provided us with the functionality to save our picture
+
+
+
+
+
+
+
 
 
 ##Favorite Scheme Expressions
@@ -53,18 +60,28 @@ To start things off, you need to only run main.rkt
 From here we have a few menus, 
 
 Main Window
+
 The left side you will find your shapes.
+
 At the bottom Save and undo.
+
 The rest is your drawing area
 
 Side window
 
+
 The radio buttons 'stroke 'fill
+
 These will allow you to change the color of the outline/filling.
+
 Whats nice about these is that they remember their respective color settings
 
+
 The above shape
+
 The oval above allows you to preview the colors you have selected.
 
+
 Apply fill check box
+
 This gives the user the choice to to draw the shapes with or without filling.
