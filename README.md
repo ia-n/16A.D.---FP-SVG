@@ -53,7 +53,7 @@ The reason I like this code so much is because it stumped me for a long time.
 What made it so difficult was trying to debug, with no clear indications other
 than a crazy shape movement pattern it required me to deeply think about the
 math events happening on the grid
-
+<br><br><br><br><br><br><br><br><br><br><br>
 #How to Download and Run
 
 The code can be downloaded here:
