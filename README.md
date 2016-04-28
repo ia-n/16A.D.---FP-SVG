@@ -10,7 +10,21 @@ Dmitri Kheifets
 Much similar to your typical paint program. With this software you are able to construct customize objects and place them on the screen. 
 ##Screenshot
 
-![alt text](https://github.com/ia-n/16A.D.---FP-SVG/blob/master/oplss.png "Logo Title Text 1")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##Concepts Demonstrated
 
