@@ -6,34 +6,36 @@ Ian Roberts
 Dmitri Kheifets
 
 ##Overview
-A brief description of the project is given here.  The description is 1 to 3 sentences long.  Be concise and clear.
+
 Much similar to your typical paint program. With this software you are able to construct Customize objects and place them on the screen. 
 ##Screenshot
 
-
-
-![screenshot showing application use](oplss.ink)
+![screenshot showing application use](oplss.png)
 
 ##Concepts Demonstrated
-Identify the OPL concepts demonstrated in your project. Be brief. A simple list and example is sufficient. 
+
 * **Object Passing** is used for the majority of the GUI 
 * The objects for the shapes stored the type of shape as well as attributes *
 * **Message passing** is how our different files communicate.
 
 ##External Technology and Libraries
-Briefly describe the existing technology you utilized, and how you used it. Provide a link to that technology(ies).
+
 racket/gui/base provided us with the canvas, panes, gui objects and  mouse events 
 racket/draw provided us with color, brush and bitmap objects
 xml provided us with the functionality to save our picture
 
 
 ##Favorite Scheme Expressions
-####Mark (a team member)
+####Ian Roberts
+```scheme
 
-```    ((λ () ( if (> x1  x2) (- x1 (max w h)) sx)))
-```            ((λ () ( if (> y1  y2)  (- y1 (max w h)) sy)))
-```          ((λ (max-run) (begin (set! max-run (max w h)) max-run))0)
-```            ((λ (max-run) (begin (set! max-run (max w h)) max-run))0)
+
+         ((λ () ( if (> x1  x2) (- x1 (max w h)) sx)))
+         ((λ () ( if (> y1  y2)  (- y1 (max w h)) sy)))
+         ((λ (max-run) (begin (set! max-run (max w h)) max-run))0)
+         ((λ (max-run) (begin (set! max-run (max w h)) max-run))0)
+```
+
 The code above was used to allow a shape object to change its starting and end points
 without that ability you could not draw a shape upwards or left.
 The reason I like this code so much is because it stumped me for a long time.
