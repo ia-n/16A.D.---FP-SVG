@@ -11,18 +11,8 @@ Much similar to your typical paint program. With this software you are able to c
 ##Screenshot
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 
 
