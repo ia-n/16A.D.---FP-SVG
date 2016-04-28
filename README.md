@@ -12,7 +12,7 @@ Much similar to your typical paint program. With this software you are able to c
 
 
 
-![screenshot showing application use](oplss.png)
+![screenshot showing application use](oplss.ink)
 
 ##Concepts Demonstrated
 Identify the OPL concepts demonstrated in your project. Be brief. A simple list and example is sufficient. 
