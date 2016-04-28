@@ -59,7 +59,7 @@ To start things off, you need to only run main.rkt
 
 From here we have a few menus, 
 
-Main Window
+**Main Window**
 
 The left side you will find your shapes.
 
@@ -67,7 +67,7 @@ At the bottom Save and undo.
 
 The rest is your drawing area
 
-Side window
+**Side window**
 
 
 The radio buttons 'stroke 'fill
