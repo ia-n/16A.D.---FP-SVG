@@ -7,7 +7,7 @@ Dmitri Kheifets
 
 ##Overview
 
-Much similar to your typical paint program. With this software you are able to construct Customize objects and place them on the screen. 
+Much similar to your typical paint program. With this software you are able to construct customize objects and place them on the screen. 
 ##Screenshot
 
 ![screenshot showing application use](oplss.png)
